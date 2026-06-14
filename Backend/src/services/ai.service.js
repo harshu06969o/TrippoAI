@@ -7,58 +7,67 @@ const ai = new GoogleGenAI({
     apiKey: process.env.GOOGLE_GENAI_API_KEY
 })
 
-
-const interviewReportSchema = z.object({
-    matchScore: z.number().describe("A score between 0 and 100 indicating how well the candidate's profile matches the job describe"),
-    technicalQuestions: z.array(z.object({
-        question: z.string().describe("The technical question can be asked in the interview"),
-        intention: z.string().describe("The intention of interviewer behind asking this question"),
-        answer: z.string().describe("How to answer this question, what points to cover, what approach to take etc.")
-    })).describe("Technical questions that can be asked in the interview along with their intention and how to answer them"),
-    behavioralQuestions: z.array(z.object({
-        question: z.string().describe("The technical question can be asked in the interview"),
-        intention: z.string().describe("The intention of interviewer behind asking this question"),
-        answer: z.string().describe("How to answer this question, what points to cover, what approach to take etc.")
-    })).describe("Behavioral questions that can be asked in the interview along with their intention and how to answer them"),
-    skillGaps: z.array(z.object({
-        skill: z.string().describe("The skill which the candidate is lacking"),
-        severity: z.enum([ "low", "medium", "high" ]).describe("The severity of this skill gap, i.e. how important is this skill for the job and how much it can impact the candidate's chances")
-    })).describe("List of skill gaps in the candidate's profile along with their severity"),
-    preparationPlan: z.array(z.object({
-        day: z.number().describe("The day number in the preparation plan, starting from 1"),
-        focus: z.string().describe("The main focus of this day in the preparation plan, e.g. data structures, system design, mock interviews etc."),
-        tasks: z.array(z.string()).describe("List of tasks to be done on this day to follow the preparation plan, e.g. read a specific book or article, solve a set of problems, watch a video etc.")
-    })).describe("A day-wise preparation plan for the candidate to follow in order to prepare for the interview effectively"),
-    title: z.string().describe("The title of the job for which the interview report is generated"),
+// 1. Zod Schema for Trip Data 
+const tripPlannerSchema = z.object({
+    hotelOptions: z.array(z.object({
+        name: z.string().describe("Name of the hotel or accommodation"),
+        address: z.string().describe("Location or address of the hotel"),
+        pricePerNight: z.string().describe("Estimated price per night in local currency or INR"),
+        rating: z.string().describe("Average user rating, e.g., 4.5/5"),
+        description: z.string().describe("Short 1-line description of why this is a good choice")
+    })).describe("Top 3 accommodation options suitable for the given budget"),
+    
+    itinerary: z.array(z.object({
+        day: z.number().describe("Day number of the trip"),
+        theme: z.string().describe("Main theme of the day, e.g., Historical City Tour"),
+        activities: z.array(z.object({
+            time: z.string().describe("Time of day, e.g., Morning, Afternoon, Evening"),
+            placeName: z.string().describe("Name of the place to visit"),
+            details: z.string().describe("What to do there and why it's recommended"),
+            ticketPrice: z.string().describe("Estimated entry fee or cost")
+        })).describe("List of activities to do on this specific day")
+    })).describe("A detailed day-by-day travel itinerary"),
+    
+    estimatedTotalCost: z.string().describe("Estimated total cost of the trip (excluding flights) based on the budget")
 })
 
-async function generateInterviewReport({ resume, selfDescription, jobDescription }) {
+/**
+ * @description Service to generate trip itinerary using Gemini AI
+ */
+/**
+ * @description Service to generate trip itinerary using Gemini AI with Deep Prompt Engineering
+ */
+async function generateTripItinerary({ destination, days, budget, travelers }) {
+    const prompt = `You are an elite, hyper-detail-oriented travel concierge and local expert for ${destination}. 
+    Your task is to research and create a logically sequenced, highly practical, and immersive ${days}-day travel itinerary for ${travelers} people on a STRICTLY '${budget}' budget.
 
+    CRITICAL INSTRUCTIONS & REAL-WORLD CONSTRAINTS:
+    1. Geographical Clustering: Group daily activities by neighborhood or proximity to minimize transit time. Do NOT suggest places that are miles apart on the same half-day.
+    2. Realistic Pacing: Factor in human constraints. Allocate realistic time for transit, specify meal breaks (suggesting local cuisine), and avoid overcrowding the schedule. Balance famous tourist spots with authentic local hidden gems.
+    3. Strict Budget Adherence: Ensure the hotel options and ticket prices perfectly align with the '${budget}' tier. A 'Cheap' budget means hostels/budget stays and public transport; 'Luxury' means 5-star stays and premium experiences.
+    4. Real-World Accuracy: Do not hallucinate places. Provide highly realistic pricing estimates in INR (₹) or the local currency. 
+    5. Actionable Details: For each activity, explain *why* it is recommended and *what* makes it special.
 
-    const prompt = `Generate an interview report for a candidate with the following details:
-                        Resume: ${resume}
-                        Self Description: ${selfDescription}
-                        Job Description: ${jobDescription}
-`
+    Analyze the geography, culture, and logistics of ${destination} deeply before generating the response. 
+    Return the output EXCLUSIVELY as a valid JSON object matching the required schema.`;
 
     const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: prompt,
         config: {
             responseMimeType: "application/json",
-            responseSchema: zodToJsonSchema(interviewReportSchema),
+            responseSchema: zodToJsonSchema(tripPlannerSchema),
         }
     })
 
     return JSON.parse(response.text)
-
-
 }
 
-
-
+/**
+ * @description Helper function to convert HTML to PDF
+ */
 async function generatePdfFromHtml(htmlContent) {
-    const browser = await puppeteer.launch()
+    const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] }) // Added args for better server deployment
     const page = await browser.newPage();
     await page.setContent(htmlContent, { waitUntil: "networkidle0" })
 
@@ -72,45 +81,36 @@ async function generatePdfFromHtml(htmlContent) {
     })
 
     await browser.close()
-
     return pdfBuffer
 }
 
-async function generateResumePdf({ resume, selfDescription, jobDescription }) {
-
-    const resumePdfSchema = z.object({
-        html: z.string().describe("The HTML content of the resume which can be converted to PDF using any library like puppeteer")
+/**
+ * @description Service to generate a beautifully formatted PDF of the trip itinerary
+ */
+async function generateTripPdf({ tripData }) {
+    const tripPdfSchema = z.object({
+        html: z.string().describe("The HTML content of the trip itinerary which can be converted to PDF using puppeteer")
     })
 
-    const prompt = `Generate resume for a candidate with the following details:
-                        Resume: ${resume}
-                        Self Description: ${selfDescription}
-                        Job Description: ${jobDescription}
-
-                        the response should be a JSON object with a single field "html" which contains the HTML content of the resume which can be converted to PDF using any library like puppeteer.
-                        The resume should be tailored for the given job description and should highlight the candidate's strengths and relevant experience. The HTML content should be well-formatted and structured, making it easy to read and visually appealing.
-                        The content of resume should be not sound like it's generated by AI and should be as close as possible to a real human-written resume.
-                        you can highlight the content using some colors or different font styles but the overall design should be simple and professional.
-                        The content should be ATS friendly, i.e. it should be easily parsable by ATS systems without losing important information.
-                        The resume should not be so lengthy, it should ideally be 1-2 pages long when converted to PDF. Focus on quality rather than quantity and make sure to include all the relevant information that can increase the candidate's chances of getting an interview call for the given job description.
-                    `
+    const prompt = `Here is a JSON containing a travel itinerary: ${JSON.stringify(tripData)}
+    
+    The response should be a JSON object with a single field "html" which contains the HTML content of this itinerary.
+    The HTML should be beautifully designed, modern, and visually appealing (using inline CSS). 
+    It should look like a premium travel brochure. Highlight the hotels and day-by-day activities clearly.`
 
     const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: prompt,
         config: {
             responseMimeType: "application/json",
-            responseSchema: zodToJsonSchema(resumePdfSchema),
+            responseSchema: zodToJsonSchema(tripPdfSchema),
         }
     })
 
-
     const jsonContent = JSON.parse(response.text)
-
     const pdfBuffer = await generatePdfFromHtml(jsonContent.html)
 
     return pdfBuffer
-
 }
 
-module.exports = { generateInterviewReport, generateResumePdf }
+module.exports = { generateTripItinerary, generateTripPdf }
