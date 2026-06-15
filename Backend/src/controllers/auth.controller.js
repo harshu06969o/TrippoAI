@@ -43,11 +43,13 @@ async function registerUserController(req, res) {
     )
 
    
+const isProduction = process.env.NODE_ENV === "production";
+
 res.cookie("token", token, {
     httpOnly: true,
-    secure: true,      
-    sameSite: "none"   
-})
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax" 
+});
 
 
     res.status(201).json({
@@ -73,9 +75,11 @@ async function loginUserController(req, res) {
 
     const user = await userModel.findOne({ email })
 
+   
+
     if (!user) {
-        return res.status(400).json({
-            message: "Invalid email or password"
+        return res.status(404).json({
+            message: "User not registered. Please create an account first."
         })
     }
 
@@ -94,11 +98,13 @@ async function loginUserController(req, res) {
     )
 
     // Login Controller 
+const isProduction = process.env.NODE_ENV === "production";
+
 res.cookie("token", token, {
     httpOnly: true,
-    secure: true,
-    sameSite: "none"
-})
+    secure: isProduction, 
+    sameSite: isProduction ? "none" : "lax" 
+});
     res.status(200).json({
         message: "User loggedIn successfully.",
         user: {
@@ -122,7 +128,13 @@ async function logoutUserController(req, res) {
         await tokenBlacklistModel.create({ token })
     }
 
-    res.clearCookie("token")
+    const isProduction = process.env.NODE_ENV === "production";
+
+res.clearCookie("token", {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax"
+});
 
     res.status(200).json({
         message: "User logged out successfully"
