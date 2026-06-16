@@ -23,7 +23,7 @@ async function generateTripItinerary({ destination, days, budget, travelers }) {
     Do not wrap the JSON in markdown backticks like \`\`\`json, just output the raw JSON directly.`;
 
  const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash", // 👈 Use the current standard fast production model
+        model: "gemini-2.5-flash",
         contents: prompt,
         config: {
             responseMimeType: "application/json"
@@ -53,7 +53,7 @@ async function generateTripPdf({ tripData }) {
     Return the output strictly as a JSON object containing a single 'html' key with the raw HTML string. Start directly with <!DOCTYPE html>.`;
 
     const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash", // 👈 Use the current standard fast production model
+        model: "gemini-2.5-flash", 
         contents: prompt,
         config: {
             responseMimeType: "application/json"
