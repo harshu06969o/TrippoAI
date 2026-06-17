@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
-import { useNavigate, Link } from 'react-router' // Ekdum sahi hai yeh
+import { useNavigate, Link } from 'react-router' 
 import { useAuth } from '../hooks/useAuth'
 
-// ─── Static content (safe to edit) ───────────────────────────────────────────
 const FEATURES = [
   {
     label: 'Deep-Constraint Planning',
@@ -21,7 +20,6 @@ const FEATURES = [
     desc: 'Invite travel companions to co-plan, vote on stops, and sync everyone to one live itinerary.',
   },
 ]
-// ─────────────────────────────────────────────────────────────────────────────
 
 const Login = () => {
 
@@ -38,7 +36,7 @@ const Login = () => {
 
     try {
       await handleLogin({ email, password })
-      navigate('/') // Sirf success pe navigate hoga
+      navigate('/') 
     } catch (err) {
       setErrorMsg(err.message || "Failed to login. Please check your credentials.")
     }
@@ -60,28 +58,22 @@ const Login = () => {
 
       {/* ── Ambient glow layer ────────────────────────────────────────────── */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        {/* Teal blob — top-left */}
         <div className="absolute -top-48 -left-48 w-[700px] h-[700px] rounded-full bg-teal-500/10 blur-[140px]" />
-        {/* Indigo blob — bottom-right */}
         <div className="absolute -bottom-48 -right-48 w-[700px] h-[700px] rounded-full bg-indigo-500/10 blur-[140px]" />
-        {/* Faint center haze */}
         <div className="absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-teal-400/4 blur-[100px]" />
       </div>
 
       {/* ── Navbar ───────────────────────────────────────────────────────── */}
       <nav className="relative z-10 flex items-center justify-between px-6 md:px-14 py-5 border-b border-white/5">
-        {/* Logo */}
         <a href="/" className="flex items-center gap-1 select-none">
           <span className="text-2xl font-bold tracking-tighter text-zinc-100">Trippo</span>
           <span className="text-2xl font-bold tracking-tighter text-teal-400"> AI</span>
         </a>
-        {/* Nav links — hidden on mobile */}
         <div className="hidden md:flex items-center gap-7 text-sm text-zinc-500">
           <a href="#" className="hover:text-zinc-200 transition-colors duration-200">Features</a>
           <a href="#" className="hover:text-zinc-200 transition-colors duration-200">Pricing</a>
           <a href="#" className="hover:text-zinc-200 transition-colors duration-200">Blog</a>
         </div>
-        {/* CTA — hidden on mobile */}
         <div className="hidden md:block">
           <Link
             to="/register"
@@ -93,18 +85,18 @@ const Login = () => {
       </nav>
 
       {/* ── Main grid ────────────────────────────────────────────────────── */}
-      <div className="relative z-10 flex flex-1 flex-col lg:flex-row items-center justify-center gap-16 px-6 md:px-14 py-14 lg:py-0 max-w-7xl mx-auto w-full">
+      {/* BUG FIX: Reduced gap on mobile (gap-12), kept gap-16 on desktop. Reduced py on mobile */}
+      <div className="relative z-10 flex flex-1 flex-col lg:flex-row items-center justify-center gap-12 lg:gap-16 px-6 md:px-14 py-10 lg:py-0 max-w-7xl mx-auto w-full">
 
         {/* Left: Hero ───────────────────────────────────────────────────── */}
-        <div className="flex-1 flex flex-col gap-8 max-w-lg">
+        {/* BUG FIX: Removed 'flex-1' for mobile so it doesn't push the login box down. Added 'lg:flex-1' for desktop only */}
+        <div className="w-full lg:flex-1 flex flex-col gap-8 max-w-lg lg:max-w-none">
 
-          {/* Eyebrow pill */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-teal-400/20 bg-teal-400/5 text-teal-400 text-xs font-medium tracking-widest uppercase w-fit">
             <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
             AI Travel Intelligence
           </div>
 
-          {/* Headline */}
           <div className="flex flex-col gap-3">
             <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-bold tracking-tighter leading-[1.08] text-zinc-100">
               Design Your Dream
@@ -118,11 +110,9 @@ const Login = () => {
             </p>
           </div>
 
-          {/* Feature highlights */}
           <ul className="flex flex-col gap-5">
             {FEATURES.map((f, i) => (
               <li key={i} className="flex items-start gap-3.5">
-                {/* Teal tick mark */}
                 <span className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-teal-400/10 border border-teal-400/30 flex items-center justify-center">
                   <svg className="w-2.5 h-2.5 text-teal-400" viewBox="0 0 10 10" fill="none" aria-hidden="true">
                     <path d="M2 5l2.5 2.5L8 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -136,40 +126,30 @@ const Login = () => {
             ))}
           </ul>
 
-          {/* Trust signal */}
           <p className="text-xs text-zinc-700 mt-1">
-            Trusted by{' '}
-            <span className="text-zinc-400 font-medium">14,000+ travellers</span>{' '}
-            across 90 countries.
+            Trusted by <span className="text-zinc-400 font-medium">14,000+ travellers</span> across 90 countries.
           </p>
 
         </div>
 
         {/* Right: Auth card ─────────────────────────────────────────────── */}
         <div className="w-full max-w-sm flex-shrink-0">
-          <div className="relative rounded-2xl border border-white/8 bg-white/[0.03] backdrop-blur-md p-10 shadow-2xl shadow-black/50">
+          {/* BUG FIX: Changed p-10 to p-7 md:p-10. Mobile me padding thodi kam ki hai taaki text ko saans lene ki jagah mile */}
+          <div className="relative rounded-2xl border border-white/8 bg-white/[0.03] backdrop-blur-md p-7 md:p-10 shadow-2xl shadow-black/50">
 
-            {/* Inner inset ring for polish */}
-            <div
-              className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/5"
-              aria-hidden="true"
-            />
+            <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/5" aria-hidden="true" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px rounded-t-2xl bg-gradient-to-r from-transparent via-teal-400/30 to-transparent" aria-hidden="true" />
 
-            {/* Subtle top-edge accent line */}
-            <div
-              className="pointer-events-none absolute inset-x-0 top-0 h-px rounded-t-2xl bg-gradient-to-r from-transparent via-teal-400/30 to-transparent"
-              aria-hidden="true"
-            />
-
-            <div className="flex flex-col gap-7">
+            {/* BUG FIX: Added px-2 to inner container so content isn't touching the boundaries of the dark card */}
+            <div className="flex flex-col gap-7 px-1 sm:px-2">
 
               {/* Card header */}
-              <div className="flex flex-col gap-1">
-                <h2 className="text-xl font-bold tracking-tight text-zinc-100">Welcome back</h2>
+              <div className="flex flex-col gap-1.5">
+                {/* BUG FIX: Changed text-xl to text-2xl */}
+                <h2 className="text-2xl font-bold tracking-tight text-zinc-100">Welcome back</h2>
                 <p className="text-sm text-zinc-500">Sign in to continue planning.</p>
               </div>
 
-              {/* Error message */}
               {errorMsg && (
                 <div className="flex items-start gap-2.5 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3">
                   <svg className="mt-0.5 w-3.5 h-3.5 text-red-400 flex-shrink-0" viewBox="0 0 14 14" fill="none" aria-hidden="true">
@@ -182,8 +162,6 @@ const Login = () => {
 
               {/* Form */}
               <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-
-                {/* Email */}
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="email" className="text-xs font-medium text-zinc-400 uppercase tracking-widest">
                     Email
@@ -199,7 +177,6 @@ const Login = () => {
                   />
                 </div>
 
-                {/* Password */}
                 <div className="flex flex-col gap-1.5">
                   <div className="flex items-center justify-between">
                     <label htmlFor="password" className="text-xs font-medium text-zinc-400 uppercase tracking-widest">
@@ -220,7 +197,6 @@ const Login = () => {
                   />
                 </div>
 
-                {/* Submit */}
                 <button
                   type="submit"
                   disabled={loading}
@@ -228,17 +204,14 @@ const Login = () => {
                 >
                   {loading ? "Signing in…" : "Sign in →"}
                 </button>
-
               </form>
 
-              {/* Divider */}
               <div className="flex items-center gap-3">
                 <div className="flex-1 h-px bg-white/6" />
                 <span className="text-xs text-zinc-600">or</span>
                 <div className="flex-1 h-px bg-white/6" />
               </div>
 
-              {/* Register CTA — intentional secondary action button */}
               <div className="flex flex-col gap-2.5">
                 <p className="text-center text-xs text-zinc-600 tracking-wide">New to Trippo AI?</p>
                 <Link
@@ -252,7 +225,6 @@ const Login = () => {
             </div>
           </div>
 
-          {/* Below-card trust note */}
           <p className="mt-4 text-center text-xs text-zinc-700">
             By signing in you agree to our{' '}
             <a href="#" className="underline hover:text-zinc-500 transition-colors">Terms</a>
@@ -265,7 +237,7 @@ const Login = () => {
 
       {/* ── Footer ───────────────────────────────────────────────────────── */}
       <footer className="relative z-10 px-6 md:px-14 py-4 border-t border-white/5 flex items-center justify-between">
-        <p className="text-xs text-zinc-700">© 2025 Trippo AI. All rights reserved.</p>
+        <p className="text-xs text-zinc-700">© 2026 Trippo AI. All rights reserved.</p>
         <div className="flex gap-5 text-xs text-zinc-700">
           <a href="#" className="hover:text-zinc-500 transition-colors">Privacy</a>
           <a href="#" className="hover:text-zinc-500 transition-colors">Terms</a>
