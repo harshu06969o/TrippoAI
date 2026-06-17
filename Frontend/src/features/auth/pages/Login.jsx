@@ -205,6 +205,11 @@ const Login = () => {
                   {loading ? "Signing in…" : "Sign in →"}
                 </button>
               </form>
+              <div className="rounded-lg border border-amber-500/10 bg-amber-500/5 px-3.5 py-2.5">
+                <p className="text-[11px] text-amber-400/90 text-center leading-normal">
+                  ⚠️ <strong className="font-semibold text-amber-300">Note :</strong> Please use a desktop browser or allow third party cookies on your Mobile . Mobile tracking prevention flags strictly block the secure cross-origin session cookies.
+                </p>
+              </div>
 
               <div className="flex items-center gap-3">
                 <div className="flex-1 h-px bg-white/6" />
