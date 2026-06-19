@@ -9,7 +9,7 @@ TrippoAI is a full-stack AI travel planner that generates hyper-personalized, ge
 - **Secure Authentication:** JWT-based session management with HTTP-only cookies and token blacklisting for enhanced security.
 
 ## 🛠️ Tech Stack
-- **Frontend:** React.js, Tailwind CSS
+- **Frontend:** React.js+Vite, Tailwind CSS
 - **Backend:** Node.js, Express.js, MongoDB (Mongoose)
 - **AI/LLM:** Google Gemini 2.5 Flash
 - **Utility:** Puppeteer (for PDF generation), Zod (for schema validation)
