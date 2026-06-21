@@ -1,25 +1,140 @@
-# TrippoAI — AI Travel Intelligence Platform
+# Trippo AI
 
-TrippoAI is a full-stack AI travel planner that generates hyper-personalized, geographically clustered travel itineraries based on real-world constraints like budget, pace, and local preferences.
+Trippo AI is a full-stack, AI-driven travel planning application that autonomously generates personalized, geographically clustered itineraries. By enforcing structured output formats from Google Gemini, the platform dynamically converts user constraints—such as destination, budget, duration, and party size—into structured day-by-day JSON plans. The system features a robust Node.js backend with JWT authentication, MongoDB for data persistence, and an in-memory PDF export pipeline.
 
-## 🚀 Key Features
-- **Intelligent Itinerary Generation:** Leverages Google Gemini 2.5 Flash to create detailed daily plans.
-- **Geographical Clustering:** Activities are grouped by proximity to minimize transit time.
-- **Dynamic PDF Generation:** High-fidelity, vector-based PDF itinerary brochures generated via Headless Puppeteer.
-- **Secure Authentication:** JWT-based session management with HTTP-only cookies and token blacklisting for enhanced security.
+## Overview
 
-## 🛠️ Tech Stack
-- **Frontend:** React.js+Vite, Tailwind CSS
-- **Backend:** Node.js, Express.js, MongoDB (Mongoose)
-- **AI/LLM:** Google Gemini 2.5 Flash
-- **Utility:** Puppeteer (for PDF generation), Zod (for schema validation)
+Trippo AI eliminates the friction of manual trip research by transforming user preferences into highly practical, ready-to-use travel itineraries. The engineering focus of this project revolves around:
+- Enforcing structured LLM output for deterministic frontend rendering.
+- Implementing secure, stateful session handling via HTTP-only cookies and token blacklisting.
+- Architecting a lightweight, zero-disk-write PDF generation pipeline.
+- Delivering a high-performance UI by selectively querying lightweight data payloads.
 
-## 🏗️ Architecture
-- **Data Pipeline:** We enforce strict JSON schemas via `Zod`, ensuring the frontend receives predictable, crash-free data from the LLM.
-- **Asset Delivery:** PDFs are rendered from dynamic HTML templates using Puppeteer, bypassing rasterization to keep document payloads lean and vector-perfect.
+## Key Features
 
-## ⚙️ Setup
-1. Clone the repo: `git clone (https://github.com/harshu06969o/TrippoAI)`
-2. Install dependencies: `npm install`
-3. Add your `.env` file (GEMINI_API_KEY, MONGO_URI, JWT_SECRET).
-4. Run server: `npm run dev`
+- **AI-Powered Itinerary Generation**  
+  Context-aware itinerary creation utilizing Google Gemini 2.5 Flash, dynamically factoring in constraints such as budget, duration, and traveler count.
+- **Geographical Clustering**  
+  Systematic grouping of daily activities by geographic proximity to optimize travel time and logical pacing.
+- **Structured Output Enforcement**  
+  Explicitly enforces `application/json` output configurations within the LLM API to guarantee predictable and crash-free data parsing.
+- **Secure Authentication Pipeline**  
+  JWT-based authentication leveraging `httpOnly` cookies, complemented by a MongoDB-backed token blacklist to ensure definitive logout invalidation and mitigate XSS risks.
+- **In-Memory PDF Export**  
+  Generates travel brochures server-side using Headless Puppeteer, streaming dynamic A4 PDF buffers directly to the client without executing intermediate disk writes.
+- **Saved Trip Management**  
+  Persists generated JSON itineraries in MongoDB, allowing authenticated users to retrieve and manage their travel history seamlessly.
+
+## Tech Stack
+
+**Frontend:** React.js, Vite, Tailwind CSS, React Router  
+**Backend:** Node.js, Express.js, MongoDB (Mongoose)  
+**AI & Utilities:** Google Gemini API (`@google/genai`), Puppeteer, JSON Web Tokens (JWT), bcryptjs
+
+## Architecture / Workflow
+
+1. **Constraint Ingestion:** The React frontend captures user-defined trip parameters.
+2. **Secure Request:** Authenticated requests are verified via HTTP-only cookies by Express middleware.
+3. **AI Orchestration:** The backend constructs an explicit prompt and requests a strictly typed JSON response from the Google Gemini API.
+4. **Persistence:** The generated structured itinerary is saved to MongoDB.
+5. **Client Rendering:** The frontend maps the JSON payload to a highly responsive, glassmorphic UI.
+6. **Asset Delivery (Optional):** If requested, the backend converts the JSON itinerary into an HTML template, renders it via Puppeteer, and streams an A4 PDF buffer back to the user.
+
+## Folder Structure
+
+```text
+TrippoAI/
+├── Backend/
+│   ├── src/
+│   │   ├── config/          # Database configuration
+│   │   ├── controllers/     # Route logic (auth, trip)
+│   │   ├── middlewares/     # JWT verification & token blacklisting
+│   │   ├── models/          # Mongoose schemas (User, Trip, Blacklist)
+│   │   ├── routes/          # API endpoint definitions
+│   │   └── services/        # External integrations (Gemini, Puppeteer)
+│   ├── package.json
+│   └── server.js            # Express entry point
+└── Frontend/
+    ├── src/
+    │   ├── features/        # Modular domain logic (auth, trip)
+    │   ├── App.jsx          # Root application component
+    │   └── app.routes.jsx   # Client-side router configuration
+    ├── package.json
+    └── vite.config.js       # Bundler configuration
+```
+
+## Setup Instructions
+
+**Prerequisites:**
+- Node.js (v18+)
+- MongoDB Atlas cluster or local instance
+- Google Gemini API Key
+
+**Backend Setup:**
+```bash
+cd Backend
+npm install
+npm run dev
+```
+
+**Frontend Setup:**
+```bash
+cd Frontend
+npm install
+npm run dev
+```
+
+## Environment Variables
+
+**Backend (`Backend/.env`)**
+```env
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_secure_jwt_secret
+GOOGLE_GENAI_API_KEY=your_gemini_api_key
+NODE_ENV=development
+```
+
+**Frontend (`Frontend/.env`)**
+```env
+VITE_API_URL=http://localhost:YOUR_BACKEND_PORT
+```
+
+## API Endpoints / Core Flows
+
+### Authentication
+- `POST /api/auth/register` — Register a new user and issue a secure session cookie
+- `POST /api/auth/login` — Authenticate and issue an HTTP-only JWT
+- `POST /api/auth/logout` — Clear cookies and blacklist the active token
+- `GET /api/auth/me` — Retrieve the current authenticated user profile
+
+### Trip Management
+- `POST /api/trip/` — Generate and save a new AI trip plan
+- `GET /api/trip/` — Fetch all historical trips for the active user (omits heavy AI JSON fields to optimize dashboard latency)
+- `GET /api/trip/:id` — Fetch full structured itinerary details
+- `GET /api/trip/:id/pdf` — Render and stream a PDF export of a specific trip
+
+## Screenshots
+
+| **Authentication** | **Trip Planner Flow** | **Itinerary Dashboard** |
+|:---:|:---:|:---:|
+| <img src="./screenshots/login.png" width="300" alt="Login Page"> | <img src="./screenshots/home.png" width="300" alt="Trip Form"> | <img src="./screenshots/trip-details.png" width="300" alt="Trip Details"> |
+
+## Known Limitations
+
+- **PDF Endpoint Integration:** The backend exposes a fully functional `/api/trip/:id/pdf` endpoint for server-side PDF generation, but the frontend currently utilizes native browser printing (`window.print()`) for exports.
+- **LLM-Based HTML Rendering:** Generating dynamic PDFs heavily relies on the LLM to format JSON into HTML before passing it to Puppeteer. For extended itineraries, this approach significantly increases API token consumption and request latency.
+- **Input Constraints:** Generating a dense, highly detailed itinerary for trip durations extending beyond 7-10 days risks output token exhaustion or parsing errors.
+
+## Future Improvements
+
+- **Local Templating:** Decouple PDF generation from the LLM by replacing dynamic AI HTML generation with static Handlebars or EJS templates to slash token consumption by >90%.
+- **Rate Limiting:** Implement `express-rate-limit` on the trip generation endpoints to prevent API abuse and protect Gemini token quotas.
+- **Frontend State Hardening:** Explicitly disable form submission buttons during active AI generation to prevent race conditions and duplicate API requests.
+
+## Why This Project
+
+Trippo AI demonstrates practical full-stack engineering by combining responsive frontend UI architecture with robust backend API design, secure authentication patterns, unstructured-to-structured AI integration, and zero-disk-write buffer streaming into one cohesive product.
+
+## License
+
+This project is for educational and portfolio use.
