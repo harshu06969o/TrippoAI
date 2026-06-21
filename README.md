@@ -128,9 +128,12 @@ VITE_API_URL=http://localhost:YOUR_BACKEND_PORT
 
 ## Future Improvements
 
-- **Local Templating:** Decouple PDF generation from the LLM by replacing dynamic AI HTML generation with static Handlebars or EJS templates to slash token consumption by >90%.
-- **Rate Limiting:** Implement `express-rate-limit` on the trip generation endpoints to prevent API abuse and protect Gemini token quotas.
-- **Frontend State Hardening:** Explicitly disable form submission buttons during active AI generation to prevent race conditions and duplicate API requests.
+- **Asynchronous Task Processing (BullMQ & Redis):** Transition intensive tasks like Gemini-based itinerary generation and Puppeteer PDF rendering to a background queue system using BullMQ. This will prevent HTTP request timeouts, enable graceful retry strategies, and allow real-time status tracking via WebSockets or Server-Sent Events (SSE).
+- **Caching Layer (Redis):** Implement Redis caching for frequently queried geographical coordinates, identical itinerary requests, and static user settings to minimize database reads and optimize response latency.
+- **Federated Authentication (OAuth 2.0):** Integrate OAuth 2.0 (e.g., Sign in with Google / GitHub via Passport.js) to offer a passwordless sign-in experience and resolve cross-origin cookie issues through standardized session redirect patterns.
+- **Local HTML Templating:** Decouple the Puppeteer rendering engine from the LLM by replacing dynamic AI-generated HTML layouts with local Handlebars or EJS templates, slashing token consumption by over 90%.
+- **Distributed Rate Limiting:** Implement Redis-backed token bucket rate-limiting on sensitive AI generation endpoints to enforce custom per-user/IP quotas and secure Gemini API budgets.
+- **Frontend UI Hardening:** Implement visual generators and disable trigger states during active AI streaming to eliminate double-submission race conditions.
 
 ## Why This Project
 
