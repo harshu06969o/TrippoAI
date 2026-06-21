@@ -117,13 +117,14 @@ VITE_API_URL=http://localhost:YOUR_BACKEND_PORT
 
 | **Authentication** | **Trip Planner Flow** | **Itinerary Dashboard** |
 |:---:|:---:|:---:|
-| <img src="./screenshots/login.png" width="300" alt="Login Page"> | <img src="./screenshots/home.png" width="300" alt="Trip Form"> | <img src="./screenshots/trip-details.png" width="300" alt="Trip Details"> |
+| <img src="./screenshots/home.png" width="300" alt="Login Page"> | <img src="./screenshots/planner.png" width="300" alt="Trip Form"> | <img src="./screenshots/trip-details.jpeg" width="300" alt="Trip Details"> |
 
 ## Known Limitations
 
 - **PDF Endpoint Integration:** The backend exposes a fully functional `/api/trip/:id/pdf` endpoint for server-side PDF generation, but the frontend currently utilizes native browser printing (`window.print()`) for exports.
 - **LLM-Based HTML Rendering:** Generating dynamic PDFs heavily relies on the LLM to format JSON into HTML before passing it to Puppeteer. For extended itineraries, this approach significantly increases API token consumption and request latency.
 - **Input Constraints:** Generating a dense, highly detailed itinerary for trip durations extending beyond 7-10 days risks output token exhaustion or parsing errors.
+- **Mobile Cross-Origin Cookie Blocking:** Due to strict tracking prevention flags on mobile browsers (such as Apple's Intelligent Tracking Prevention), secure cross-origin session cookies are often blocked. For reliable authentication, it is recommended to use a desktop browser or manually enable third-party cookies on your mobile browser.
 
 ## Future Improvements
 
