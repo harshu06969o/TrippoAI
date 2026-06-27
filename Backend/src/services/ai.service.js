@@ -23,7 +23,7 @@ async function generateTripItinerary({ destination, days, budget, travelers }) {
     Do not wrap the JSON in markdown backticks like \`\`\`json, just output the raw JSON directly.`;
 
  const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-3.1-flash-lite",
         contents: prompt,
         config: {
             responseMimeType: "application/json"
@@ -34,36 +34,85 @@ async function generateTripItinerary({ destination, days, budget, travelers }) {
 }
 
 async function generatePdfFromHtml(htmlContent) {
-    const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] })
-    const page = await browser.newPage();
-    await page.setContent(htmlContent, { waitUntil: "networkidle0" })
+    let browser;
+    try {
+        browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] })
+        const page = await browser.newPage();
+        await page.setContent(htmlContent, { waitUntil: "networkidle0" })
 
-    const pdfBuffer = await page.pdf({
-        format: "A4", margin: { top: "20mm", bottom: "20mm", left: "15mm", right: "15mm" }
-    })
+        const pdfBuffer = await page.pdf({
+            format: "A4", margin: { top: "20mm", bottom: "20mm", left: "15mm", right: "15mm" }
+        })
 
-    await browser.close()
-    return pdfBuffer
-}
-
-async function generateTripPdf({ tripData }) {
-    const prompt = `Convert this trip itinerary data into a beautifully designed, modern HTML string with inline CSS so it looks like a premium travel brochure. 
-    Data: ${JSON.stringify(tripData)}
-    
-    Return the output strictly as a JSON object containing a single 'html' key with the raw HTML string. Start directly with <!DOCTYPE html>.`;
-
-    const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash", 
-        contents: prompt,
-        config: {
-            responseMimeType: "application/json"
+        return pdfBuffer
+    } finally {
+        if (browser) {
+            await browser.close()
         }
-    })
+    }
+}
 
-    const jsonContent = JSON.parse(response.text)
-    const pdfBuffer = await generatePdfFromHtml(jsonContent.html)
+async function generateStaticPdf(tripData) {
+    const html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; line-height: 1.6; }
+                h1 { color: #2c3e50; text-align: center; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+                h2 { color: #2980b9; margin-top: 20px; }
+                h3 { color: #16a085; }
+                .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+                .summary { background: #ecf0f1; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+                .day-card { border: 1px solid #ddd; border-left: 4px solid #3498db; padding: 15px; margin-bottom: 20px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+                .activity { margin-bottom: 10px; padding-left: 10px; border-left: 2px solid #bdc3c7; }
+                .hotel-card { background: #fdfbfb; border: 1px solid #e0e0e0; padding: 15px; margin-bottom: 15px; border-radius: 4px; }
+                .price { font-weight: bold; color: #e74c3c; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>Trip to ${tripData.destination || 'Unknown Destination'}</h1>
+                
+                <div class="summary">
+                    <p><strong>Duration:</strong> ${tripData.days || 0} Days</p>
+                    <p><strong>Travelers:</strong> ${tripData.travelers || 1}</p>
+                    <p><strong>Budget Tier:</strong> ${tripData.budget || 'Standard'}</p>
+                    <p><strong>Estimated Total Cost:</strong> ${tripData.estimatedTotalCost || 'N/A'}</p>
+                </div>
+
+                <h2>Recommended Hotels</h2>
+                ${(tripData.hotelOptions || []).map(hotel => `
+                    <div class="hotel-card">
+                        <h3>${hotel.name}</h3>
+                        <p><strong>Address:</strong> ${hotel.address}</p>
+                        <p><strong>Rating:</strong> ${hotel.rating} / 5</p>
+                        <p><strong>Price:</strong> <span class="price">${hotel.pricePerNight}</span> per night</p>
+                        <p>${hotel.description}</p>
+                    </div>
+                `).join('')}
+
+                <h2>Itinerary</h2>
+                ${(tripData.itinerary || []).map(day => `
+                    <div class="day-card">
+                        <h3>Day ${day.day}: ${day.theme}</h3>
+                        ${(day.activities || []).map(act => `
+                            <div class="activity">
+                                <p><strong>${act.time} - ${act.placeName}</strong></p>
+                                <p>${act.details}</p>
+                                <p><em>Cost: ${act.ticketPrice}</em></p>
+                            </div>
+                        `).join('')}
+                    </div>
+                `).join('')}
+            </div>
+        </body>
+        </html>
+    `;
+
+    const pdfBuffer = await generatePdfFromHtml(html)
 
     return pdfBuffer
 }
 
-module.exports = { generateTripItinerary, generateTripPdf }
+module.exports = { generateTripItinerary, generateStaticPdf }

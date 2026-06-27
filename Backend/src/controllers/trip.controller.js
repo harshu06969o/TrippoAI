@@ -1,5 +1,5 @@
 const tripModel = require("../models/trip.model")
-const { generateTripItinerary, generateTripPdf } = require("../services/ai.service")
+const { generateTripItinerary, generateStaticPdf } = require("../services/ai.service")
 
 /**
  * @name generateTripController
@@ -94,8 +94,8 @@ async function downloadTripPdfController(req, res) {
             return res.status(404).json({ message: "Trip not found" })
         }
 
-        // Call AI to design HTML and convert to PDF Buffer
-        const pdfBuffer = await generateTripPdf({ tripData: trip })
+        // Call static generator to design HTML and convert to PDF Buffer
+        const pdfBuffer = await generateStaticPdf(trip)
 
         // Set headers so the browser knows it's downloading a PDF
         res.set({
