@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = `${import.meta.env.VITE_BACKEND_URL}/api/trip`; 
+const API_URL = `/api/trip`; 
 
 export const generateTripAPI = async (tripData) => {
     const response = await axios.post(`${API_URL}/`, tripData, {
