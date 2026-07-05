@@ -292,14 +292,6 @@ const Login = () => {
                 </button>
               </form>
 
-              {/* ── Mobile cookie warning — PRESERVED EXACTLY ────────── */}
-              <div className="rounded-xl border border-amber-500/15 bg-amber-500/[0.06] px-4 py-3">
-                <p className="text-[11px] text-amber-400/90 text-center leading-relaxed">
-                  ⚠️{' '}
-                  <strong className="font-bold text-amber-300">Note:</strong>{' '}
-                  Please use a desktop browser or allow third party cookies on your Mobile. Mobile tracking prevention flags strictly block the secure cross-origin session cookies.
-                </p>
-              </div>
 
               {/* Divider */}
               <div className="flex items-center gap-3">
