@@ -141,7 +141,7 @@ const Login = () => {
 
     try {
       await handleLogin({ email, password })
-      navigate('/')
+      navigate('/dashboard')
     } catch (err) {
       setErrorMsg(err.message || "Failed to login. Please check your credentials.")
     }
@@ -272,21 +272,18 @@ const Login = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="mt-1 relative w-full h-14 rounded-xl font-bold text-sm tracking-wide text-slate-950 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden group"
-                  style={{
-                    background: 'linear-gradient(135deg, #22d3ee 0%, #38bdf8 50%, #818cf8 100%)',
-                  }}
+                  className="btn-submit"
+                  style={{ marginTop: 4 }}
                 >
-                  {/* Hover shimmer overlay */}
-                  <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: 'linear-gradient(135deg, #67e8f9 0%, #22d3ee 50%, #6366f1 100%)' }} />
-                  <span className="relative z-10 flex items-center justify-center gap-2">
+                  <span className="btn-hover-overlay" aria-hidden="true" />
+                  <span className="btn-label">
                     {loading ? (
                       <>
-                        <span className="w-4 h-4 rounded-full border-2 border-slate-900/40 border-t-slate-900 animate-spin" />
+                        <span style={{ width: 16, height: 16, borderRadius: '50%', border: '2px solid rgba(11,17,32,0.3)', borderTopColor: '#0b1120', display: 'inline-block', animation: 'spin 0.85s linear infinite', flexShrink: 0 }} />
                         Signing in…
                       </>
                     ) : (
-                      <>Sign in <span aria-hidden="true">→</span></>
+                      <>Sign in →</>
                     )}
                   </span>
                 </button>

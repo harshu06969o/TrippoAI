@@ -1,127 +1,416 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   GLOBAL BASE STYLES
+───────────────────────────────────────────────────────────────────────────── */
 @layer base {
   :root {
-    --color-brand-cyan: #22d3ee;
-    --color-brand-blue: #3b82f6;
-    --glow-cyan: rgba(6, 182, 212, 0.15);
-    --glow-blue: rgba(59, 130, 246, 0.1);
-  }
-
-  body {
-    @apply bg-slate-950 text-slate-50 antialiased;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    --brand-cyan:   #22d3ee;
+    --brand-blue:   #38bdf8;
+    --brand-indigo: #818cf8;
+    --bg-base:      #080c18;
   }
 
   html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    box-sizing: border-box;
   }
+  *, *::before, *::after { box-sizing: inherit; }
 
-  /* Remove number input spinners */
-  input[type='number']::-webkit-inner-spin-button,
-  input[type='number']::-webkit-outer-spin-button {
-    -webkit-appearance: none;
+  body {
+    background-color: #080c18;
+    color: #f8fafc;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.5;
     margin: 0;
-  }
-  input[type='number'] {
-    -moz-appearance: textfield;
+    padding: 0;
   }
 
-  /* Premium select styling */
-  select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
+  /* ── Number input spinners ── */
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type='number'] { -moz-appearance: textfield; }
+
+  /* ── Select appearance ── */
+  select { -webkit-appearance: none; -moz-appearance: none; appearance: none; }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(100,116,139,0.35); border-radius: 999px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(100,116,139,0.6); }
+
+  /* ── Text selection ── */
+  ::selection { background: rgba(6,182,212,0.22); color: #a5f3fc; }
+
+  /* ── Remove ALL default browser outlines globally.
+     Every interactive element that needs a focus indicator
+     gets its own box-shadow based ring via its specific class. ── */
+  a, button, input, select, textarea,
+  [role="button"], [tabindex] {
+    outline: none !important;
+  }
+  a:focus, button:focus, input:focus,
+  a:focus-visible, button:focus-visible {
+    outline: none !important;
   }
 
-  /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: rgba(99, 110, 130, 0.4);
-    border-radius: 999px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(99, 110, 130, 0.7);
+
+  /* ── CRITICAL: Fix browser autofill overriding input dark background ──
+     Chrome injects its own blue/white background on autofilled inputs.
+     We override it by injecting a massive inset box-shadow (same as bg color). */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 9999px #0f172a inset !important;
+    box-shadow: 0 0 0 9999px #0f172a inset !important;
+    -webkit-text-fill-color: #f1f5f9 !important;
+    caret-color: #f1f5f9;
+    border-color: rgba(51,65,85,0.8) !important;
+    transition: background-color 99999s ease-in-out 0s; /* delay bg change forever */
   }
 
-  /* Text selection */
-  ::selection {
-    background: rgba(6, 182, 212, 0.25);
-    color: #a5f3fc;
-  }
+  /* ── Remove ALL default focus outlines globally.
+     We add our own via box-shadow where needed. ── */
+  *:focus { outline: none; }
+  *:focus-visible { outline: none; }
 }
 
-/* ── Keyframe Animations ─────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   KEYFRAME ANIMATIONS
+───────────────────────────────────────────────────────────────────────────── */
 @keyframes float-slow {
-  0%, 100% { transform: translateY(0px) translateX(0px); }
-  33%       { transform: translateY(-18px) translateX(8px); }
-  66%       { transform: translateY(8px) translateX(-12px); }
+  0%, 100% { transform: translateY(0) translateX(0); }
+  33%       { transform: translateY(-14px) translateX(7px); }
+  66%       { transform: translateY(7px) translateX(-9px); }
 }
 
-@keyframes shimmer {
+@keyframes shimmer-move {
   0%   { background-position: -200% center; }
-  100% { background-position: 200% center; }
+  100% { background-position:  200% center; }
 }
 
-@keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(20px); }
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes scale-in {
-  from { opacity: 0; transform: scale(0.96); }
+  from { opacity: 0; transform: scale(0.97); }
   to   { opacity: 1; transform: scale(1); }
 }
 
-@keyframes glow-pulse {
-  0%, 100% { opacity: 0.6; }
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.5; }
   50%       { opacity: 1; }
 }
 
-@layer utilities {
-  .animate-float-slow   { animation: float-slow 12s ease-in-out infinite; }
-  .animate-fade-in-up   { animation: fade-in-up 0.5s ease-out both; }
-  .animate-scale-in     { animation: scale-in 0.4s ease-out both; }
-  .animate-glow-pulse   { animation: glow-pulse 3s ease-in-out infinite; }
+@keyframes spin-cw { to { transform: rotate(360deg); } }
 
-  /* Gradient text shimmer */
-  .text-shimmer {
-    background: linear-gradient(
-      135deg,
-      #67e8f9 0%,
-      #38bdf8 25%,
-      #818cf8 50%,
-      #38bdf8 75%,
-      #67e8f9 100%
-    );
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: shimmer 4s linear infinite;
-  }
+/* ─────────────────────────────────────────────────────────────────────────────
+   CUSTOM UTILITY CLASSES  (placed OUTSIDE @layer so they have highest priority)
+───────────────────────────────────────────────────────────────────────────── */
 
-  /* Glass card surface */
-  .glass-surface {
-    background: rgba(255, 255, 255, 0.02);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-  }
+/* Animations */
+.animate-float-slow { animation: float-slow 14s ease-in-out infinite; }
+.animate-fade-up    { animation: fade-up    0.55s ease-out both; }
+.animate-scale-in   { animation: scale-in   0.42s ease-out both; }
+.animate-glow-pulse { animation: pulse-glow 3s    ease-in-out infinite; }
+.animate-spin-btn   { animation: spin-cw    0.85s linear infinite; }
 
-  /* Input base */
-  .input-premium {
-    @apply w-full h-14 rounded-xl border border-slate-800 bg-slate-950/80 px-5 text-sm text-slate-100 placeholder-slate-600 outline-none transition-all duration-200;
-    @apply focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/15 focus:bg-slate-900/80;
-    @apply hover:border-slate-700;
-  }
+/* ── Shimmer gradient text ── */
+.text-shimmer {
+  background: linear-gradient(
+    135deg,
+    #67e8f9 0%, #38bdf8 28%, #818cf8 52%, #38bdf8 76%, #67e8f9 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-move 4s linear infinite;
+}
+
+/* ── Glass card ── */
+.glass-card {
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.07);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   BTN-PRIMARY
+   The "Sign Up Free", "Start Planning", "Start Your Journey" buttons.
+
+   ROOT CAUSE FIX:
+   • `box-shadow` was the "border ring" — it glowed cyan visually identical
+     to a border. We now use a VERY subtle shadow (dark only, no cyan glow).
+   • `outline: none` + `outline: none` on :focus/:focus-visible stops the
+     browser from drawing its own focus ring.
+   • `border: 2px solid transparent` — we explicitly set a transparent border
+     so the border-radius edge paints cleanly against any background.
+   • NO overflow:hidden — this was clipping the text on fixed-height buttons.
+   • height is driven purely by padding + line-height:1, never by h-XX class.
+───────────────────────────────────────────────────────────────────────────── */
+.btn-primary {
+  /* Layout */
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  /* Sizing — driven by padding, NOT by height */
+  padding: 13px 28px;
+  border-radius: 12px;
+
+  /* Typography */
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;          /* CRITICAL — stops line-height from inflating height */
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  color: #0a1628;          /* Dark text on bright gradient */
+  text-decoration: none;
+
+  /* Visual */
+  background: linear-gradient(135deg, #22d3ee 0%, #38bdf8 55%, #818cf8 100%);
+  border: 2px solid transparent;   /* transparent border, not none — prevents paint artifacts */
+  /* Subtle shadow — dark only, NO cyan color that looked like a border ring */
+  box-shadow: 0 2px 12px rgba(0,0,0,0.35);
+
+  /* Behaviour */
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+
+  /* NO overflow:hidden — that's what caused text clipping */
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+}
+
+.btn-primary:active {
+  transform: scale(0.975);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.3);
+}
+
+/* Remove ALL browser focus rings */
+.btn-primary:focus,
+.btn-primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(34,211,238,0.35), 0 2px 12px rgba(0,0,0,0.35);
+}
+
+/* Hover shimmer overlay — pointer-events:none so it NEVER blocks clicks */
+.btn-primary .btn-hover-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #67e8f9 0%, #22d3ee 40%, #6366f1 100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.btn-primary:hover .btn-hover-overlay { opacity: 1; }
+
+/* Text / icon wrapper — sits above the overlay */
+.btn-primary .btn-label {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1;
+  white-space: nowrap;
+  color: inherit;
+}
+
+/* Size modifiers */
+.btn-primary.btn-lg {
+  padding: 15px 32px;
+  font-size: 16px;
+  border-radius: 14px;
+}
+.btn-primary.btn-sm {
+  padding: 9px 18px;
+  font-size: 13px;
+  border-radius: 9px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   BTN-GHOST  (secondary / outline button)
+───────────────────────────────────────────────────────────────────────────── */
+.btn-ghost {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 24px;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  color: rgba(203,213,225,0.88);
+  text-decoration: none;
+  border: 1.5px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.04);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: all 0.18s ease;
+}
+
+.btn-ghost:hover {
+  border-color: rgba(255,255,255,0.3);
+  color: #fff;
+  background: rgba(255,255,255,0.08);
+  transform: translateY(-1px);
+}
+
+.btn-ghost:active { transform: scale(0.975); }
+
+.btn-ghost:focus,
+.btn-ghost:focus-visible {
+  outline: none;
+  border-color: rgba(34,211,238,0.5);
+}
+
+.btn-ghost.btn-lg {
+  padding: 15px 28px;
+  font-size: 16px;
+  border-radius: 14px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   BTN-SUBMIT  (full-width form submit — Login / Register pages)
+   Same fix logic as btn-primary.
+───────────────────────────────────────────────────────────────────────────── */
+.btn-submit {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 15px 24px;          /* explicit padding, no fixed height */
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;              /* CRITICAL */
+  color: #0a1628;
+  background: linear-gradient(135deg, #22d3ee 0%, #38bdf8 55%, #818cf8 100%);
+  border: 2px solid transparent;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
+}
+
+.btn-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+.btn-submit:active:not(:disabled) {
+  transform: scale(0.977);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.3);
+}
+
+.btn-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.btn-submit:focus,
+.btn-submit:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(34,211,238,0.35), 0 2px 12px rgba(0,0,0,0.3);
+}
+
+/* Hover shimmer overlay */
+.btn-submit .btn-hover-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #67e8f9 0%, #22d3ee 40%, #6366f1 100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.btn-submit:not(:disabled):hover .btn-hover-overlay { opacity: 1; }
+
+/* Text wrapper */
+.btn-submit .btn-label {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1;
+  color: inherit;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   INPUT-PREMIUM  (all text inputs on Login / Register / TripForm)
+───────────────────────────────────────────────────────────────────────────── */
+.input-premium {
+  display: block;
+  width: 100%;
+  padding: 0 18px;
+  height: 52px;                   /* explicit px height */
+  border-radius: 10px;
+  border: 1.5px solid rgba(51,65,85,0.7);
+  background: rgba(10,15,35,0.85);
+  color: #f1f5f9;
+  font-size: 15px;
+  font-family: inherit;
+  line-height: 52px;              /* vertically center text */
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.input-premium::placeholder { color: rgba(71,85,105,0.8); }
+
+.input-premium:hover:not(:focus) {
+  border-color: rgba(71,85,105,0.9);
+}
+
+.input-premium:focus {
+  border-color: rgba(34,211,238,0.55);
+  box-shadow: 0 0 0 3px rgba(34,211,238,0.12);
+  background: rgba(10,15,35,0.95);
+}
+
+/* Autofill — already handled in @layer base above, but repeat for specificity */
+.input-premium:-webkit-autofill,
+.input-premium:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 9999px #0f172a inset, 0 0 0 3px rgba(34,211,238,0.12) !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
+}
+
+/* glass-surface alias (used in TripForm & Protected loading screen) */
+.glass-surface {
+  background: rgba(255,255,255,0.025);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.07);
 }

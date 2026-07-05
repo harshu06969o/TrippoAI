@@ -3,11 +3,22 @@ import { createBrowserRouter, Navigate } from "react-router";
 import Login from "./features/auth/pages/Login";
 import Register from "./features/auth/pages/Register";
 import Protected from "./features/auth/components/Protected";
+import LandingPage from "./features/landing/pages/LandingPage";
 
 import TripForm from "./features/trip/pages/TripForm";
 import TripDetails from "./features/trip/pages/TripDetails";
 
 export const router = createBrowserRouter([
+    // Public Landing Page — default route
+    {
+        path: "/",
+        element: <LandingPage />
+    },
+    {
+        path: "/home",
+        element: <LandingPage />
+    },
+
     // Public Auth Routes
     { 
         path: "/login", 
@@ -20,7 +31,7 @@ export const router = createBrowserRouter([
     
     // Protected Trip Routes
     { 
-        path: "/", 
+        path: "/dashboard", 
         element: (
             <Protected>
                 <TripForm />

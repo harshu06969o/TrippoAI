@@ -179,7 +179,7 @@ const TripForm = () => {
             {/* ── Navbar ────────────────────────────────────────────── */}
             <nav className="relative z-10 flex items-center justify-between px-6 md:px-12 py-5 border-b border-white/[0.05]">
 
-                <a href="/" className="flex items-center gap-0.5 select-none group">
+                <a href="/dashboard" className="flex items-center gap-0.5 select-none group">
                     <span className="text-xl font-black tracking-tighter text-slate-100 transition-colors duration-200 group-hover:text-white">Trippo</span>
                     <span className="text-xl font-black tracking-tighter text-cyan-400 transition-colors duration-200 group-hover:text-cyan-300"> AI</span>
                 </a>
@@ -348,15 +348,13 @@ const TripForm = () => {
                                 {/* ── CTA submit button ──────────────────── */}
                                 <button
                                     type="submit"
-                                    className="relative w-full h-16 rounded-2xl font-black text-base tracking-wide text-slate-950 transition-all duration-200 active:scale-[0.98] overflow-hidden group shadow-xl shadow-cyan-500/10"
-                                    style={{
-                                        background: 'linear-gradient(135deg, #22d3ee 0%, #38bdf8 50%, #818cf8 100%)',
-                                    }}
+                                    className="btn-submit"
+                                    style={{ marginTop: 8 }}
                                 >
-                                    <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: 'linear-gradient(135deg, #67e8f9 0%, #22d3ee 50%, #6366f1 100%)' }} />
-                                    <span className="relative z-10 flex items-center justify-center gap-3">
-                                        <span>Generate My Itinerary</span>
-                                        <span className="text-lg leading-none" aria-hidden="true">✨</span>
+                                    <span className="btn-hover-overlay" aria-hidden="true" />
+                                    <span className="btn-label">
+                                        Generate My Itinerary
+                                        <span aria-hidden="true" style={{ fontSize: 18, lineHeight: 1 }}>✨</span>
                                     </span>
                                 </button>
 
