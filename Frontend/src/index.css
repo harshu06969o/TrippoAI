@@ -1,93 +1,131 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+/* ── Google Fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   GLOBAL BASE STYLES
-───────────────────────────────────────────────────────────────────────────── */
-@layer base {
-  :root {
-    --brand-cyan:   #22d3ee;
-    --brand-blue:   #38bdf8;
-    --brand-indigo: #818cf8;
-    --bg-base:      #080c18;
-  }
+/* ═══════════════════════════════════════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  /* Brand */
+  --cyan:         #22d3ee;
+  --cyan-dim:     #0891b2;
+  --blue:         #38bdf8;
+  --indigo:       #818cf8;
+  --violet:       #a78bfa;
+  --gold:         #f59e0b;
+  --rose:         #f43f5e;
 
+  /* Surfaces */
+  --bg-base:      #050a16;
+  --bg-dark:      #080c18;
+  --bg-card:      #0c1424;
+  --bg-elevated:  #101828;
+
+  /* Text */
+  --text-primary: #f8fafc;
+  --text-muted:   #94a3b8;
+  --text-subtle:  #475569;
+  --text-dim:     #334155;
+
+  /* Borders */
+  --border-base:  rgba(255,255,255,0.06);
+  --border-muted: rgba(255,255,255,0.04);
+  --border-cyan:  rgba(34,211,238,0.25);
+  --border-glass: rgba(255,255,255,0.08);
+
+  /* Shadows */
+  --shadow-sm:    0 2px 8px rgba(0,0,0,0.4);
+  --shadow-md:    0 8px 32px rgba(0,0,0,0.5);
+  --shadow-lg:    0 24px 64px rgba(0,0,0,0.6);
+  --shadow-glow:  0 0 40px rgba(34,211,238,0.18);
+
+  /* Radius */
+  --radius-sm:    8px;
+  --radius-md:    12px;
+  --radius-lg:    16px;
+  --radius-xl:    20px;
+  --radius-2xl:   24px;
+  --radius-3xl:   32px;
+  --radius-pill:  9999px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BASE RESET
+═══════════════════════════════════════════════════════════════════════════ */
+@layer base {
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
     box-sizing: border-box;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   *, *::before, *::after { box-sizing: inherit; }
 
   body {
-    background-color: #080c18;
-    color: #f8fafc;
+    background-color: var(--bg-base);
+    color: var(--text-primary);
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
     line-height: 1.5;
     margin: 0;
     padding: 0;
   }
 
-  /* ── Number input spinners ── */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', 'Inter', sans-serif;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+
+  /* Number input spinners */
   input[type='number']::-webkit-inner-spin-button,
   input[type='number']::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   input[type='number'] { -moz-appearance: textfield; }
 
-  /* ── Select appearance ── */
+  /* Select */
   select { -webkit-appearance: none; -moz-appearance: none; appearance: none; }
 
-  /* ── Scrollbar ── */
-  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(100,116,139,0.35); border-radius: 999px; }
-  ::-webkit-scrollbar-thumb:hover { background: rgba(100,116,139,0.6); }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(34,211,238,0.2);
+    border-radius: 999px;
+    transition: background 0.2s;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(34,211,238,0.45); }
 
-  /* ── Text selection ── */
-  ::selection { background: rgba(6,182,212,0.22); color: #a5f3fc; }
+  /* Text selection */
+  ::selection { background: rgba(34,211,238,0.25); color: #a5f3fc; }
 
-  /* ── Remove ALL default browser outlines globally.
-     Every interactive element that needs a focus indicator
-     gets its own box-shadow based ring via its specific class. ── */
-  a, button, input, select, textarea,
-  [role="button"], [tabindex] {
+  /* Focus rings — custom box-shadow based, never browser defaults */
+  a, button, input, select, textarea, [role="button"], [tabindex] {
     outline: none !important;
   }
-  a:focus, button:focus, input:focus,
-  a:focus-visible, button:focus-visible {
-    outline: none !important;
-  }
+  *:focus, *:focus-visible { outline: none !important; }
 
-
-  /* ── CRITICAL: Fix browser autofill overriding input dark background ──
-     Chrome injects its own blue/white background on autofilled inputs.
-     We override it by injecting a massive inset box-shadow (same as bg color). */
+  /* Autofill fix — override Chrome's yellow/blue background */
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus,
   input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 9999px #0f172a inset !important;
-    box-shadow: 0 0 0 9999px #0f172a inset !important;
+    -webkit-box-shadow: 0 0 0 9999px #0c1424 inset !important;
+    box-shadow:         0 0 0 9999px #0c1424 inset !important;
     -webkit-text-fill-color: #f1f5f9 !important;
     caret-color: #f1f5f9;
-    border-color: rgba(51,65,85,0.8) !important;
-    transition: background-color 99999s ease-in-out 0s; /* delay bg change forever */
+    border-color: rgba(34,211,238,0.3) !important;
+    transition: background-color 99999s ease-in-out 0s;
   }
-
-  /* ── Remove ALL default focus outlines globally.
-     We add our own via box-shadow where needed. ── */
-  *:focus { outline: none; }
-  *:focus-visible { outline: none; }
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════════════════
    KEYFRAME ANIMATIONS
-───────────────────────────────────────────────────────────────────────────── */
+═══════════════════════════════════════════════════════════════════════════ */
 @keyframes float-slow {
-  0%, 100% { transform: translateY(0) translateX(0); }
-  33%       { transform: translateY(-14px) translateX(7px); }
-  66%       { transform: translateY(7px) translateX(-9px); }
+  0%, 100% { transform: translateY(0) translateX(0) scale(1); }
+  33%       { transform: translateY(-16px) translateX(8px) scale(1.01); }
+  66%       { transform: translateY(8px) translateX(-10px) scale(0.99); }
 }
 
 @keyframes shimmer-move {
@@ -95,124 +133,206 @@
   100% { background-position:  200% center; }
 }
 
-@keyframes fade-up {
-  from { opacity: 0; transform: translateY(16px); }
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes scale-in {
-  from { opacity: 0; transform: scale(0.97); }
-  to   { opacity: 1; transform: scale(1); }
+  from { opacity: 0; transform: scale(0.94) translateY(8px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
 }
 
 @keyframes pulse-glow {
-  0%, 100% { opacity: 0.5; }
-  50%       { opacity: 1; }
+  0%, 100% { opacity: 0.45; transform: scale(1); }
+  50%       { opacity: 1;    transform: scale(1.08); }
 }
 
-@keyframes spin-cw { to { transform: rotate(360deg); } }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   CUSTOM UTILITY CLASSES  (placed OUTSIDE @layer so they have highest priority)
-───────────────────────────────────────────────────────────────────────────── */
+@keyframes spin-reverse { to { transform: rotate(-360deg); } }
 
-/* Animations */
-.animate-float-slow { animation: float-slow 14s ease-in-out infinite; }
-.animate-fade-up    { animation: fade-up    0.55s ease-out both; }
-.animate-scale-in   { animation: scale-in   0.42s ease-out both; }
-.animate-glow-pulse { animation: pulse-glow 3s    ease-in-out infinite; }
-.animate-spin-btn   { animation: spin-cw    0.85s linear infinite; }
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-/* ── Shimmer gradient text ── */
+@keyframes aurora-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25%       { transform: translate(3%, 2%) scale(1.04); }
+  50%       { transform: translate(-2%, 4%) scale(1.02); }
+  75%       { transform: translate(4%, -2%) scale(1.03); }
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+
+@keyframes particle-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.6; }
+  50%       { transform: translateY(-20px) rotate(180deg); opacity: 1; }
+}
+
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes progress-fill {
+  from { width: 0; }
+  to   { width: var(--target-width); }
+}
+
+@keyframes ping-slow {
+  75%, 100% { transform: scale(2); opacity: 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ANIMATION UTILITY CLASSES
+═══════════════════════════════════════════════════════════════════════════ */
+.animate-float-slow    { animation: float-slow     14s ease-in-out infinite; }
+.animate-fade-in-up    { animation: fade-in-up     0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-scale-in      { animation: scale-in       0.48s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-glow-pulse    { animation: pulse-glow     2.8s ease-in-out infinite; }
+.animate-spin-btn      { animation: spin           0.85s linear infinite; }
+.animate-spin-reverse  { animation: spin-reverse   1.2s linear infinite; }
+.animate-slide-up      { animation: slide-up       0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-aurora        { animation: aurora-drift   18s ease-in-out infinite; }
+.animate-gradient      { animation: gradient-shift 8s ease infinite; }
+.animate-ping-slow     { animation: ping-slow      2s cubic-bezier(0, 0, 0.2, 1) infinite; }
+
+/* Stagger delay helpers */
+.delay-100  { animation-delay: 0.1s; }
+.delay-200  { animation-delay: 0.2s; }
+.delay-300  { animation-delay: 0.3s; }
+.delay-400  { animation-delay: 0.4s; }
+.delay-500  { animation-delay: 0.5s; }
+.delay-600  { animation-delay: 0.6s; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TEXT SHIMMER (gradient animated text)
+═══════════════════════════════════════════════════════════════════════════ */
 .text-shimmer {
   background: linear-gradient(
     135deg,
-    #67e8f9 0%, #38bdf8 28%, #818cf8 52%, #38bdf8 76%, #67e8f9 100%
+    #67e8f9 0%,
+    #38bdf8 20%,
+    #818cf8 45%,
+    #a78bfa 60%,
+    #38bdf8 80%,
+    #67e8f9 100%
   );
-  background-size: 200% auto;
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-move 5s linear infinite;
+}
+
+.text-shimmer-gold {
+  background: linear-gradient(
+    135deg,
+    #fbbf24 0%, #f59e0b 30%, #fcd34d 55%, #f59e0b 80%, #fbbf24 100%
+  );
+  background-size: 250% auto;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: shimmer-move 4s linear infinite;
 }
 
-/* ── Glass card ── */
-.glass-card {
-  background: rgba(255,255,255,0.025);
-  border: 1px solid rgba(255,255,255,0.07);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+/* ═══════════════════════════════════════════════════════════════════════════
+   GLASS SURFACES
+═══════════════════════════════════════════════════════════════════════════ */
+
+/* Base glass card */
+.glass-surface {
+  background: rgba(12, 20, 36, 0.7);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--border-glass);
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   BTN-PRIMARY
-   The "Sign Up Free", "Start Planning", "Start Your Journey" buttons.
+/* Elevated glass (auth cards, modals) */
+.glass-card {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(15, 24, 42, 0.85) 0%,
+    rgba(10, 16, 30, 0.90) 100%
+  );
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
+  border: 1px solid rgba(255,255,255,0.07);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.03) inset,
+    0 24px 64px rgba(0,0,0,0.55),
+    0 1px 0 rgba(255,255,255,0.06) inset;
+}
 
-   ROOT CAUSE FIX:
-   • `box-shadow` was the "border ring" — it glowed cyan visually identical
-     to a border. We now use a VERY subtle shadow (dark only, no cyan glow).
-   • `outline: none` + `outline: none` on :focus/:focus-visible stops the
-     browser from drawing its own focus ring.
-   • `border: 2px solid transparent` — we explicitly set a transparent border
-     so the border-radius edge paints cleanly against any background.
-   • NO overflow:hidden — this was clipping the text on fixed-height buttons.
-   • height is driven purely by padding + line-height:1, never by h-XX class.
-───────────────────────────────────────────────────────────────────────────── */
+/* Subtle glass for nav */
+.glass-nav {
+  background: rgba(5, 10, 22, 0.85);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BTN-PRIMARY — Hero / CTA gradient button
+═══════════════════════════════════════════════════════════════════════════ */
 .btn-primary {
-  /* Layout */
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-
-  /* Sizing — driven by padding, NOT by height */
   padding: 13px 28px;
-  border-radius: 12px;
-
-  /* Typography */
-  font-family: inherit;
+  border-radius: 14px;
+  font-family: 'Inter', sans-serif;
   font-size: 15px;
   font-weight: 700;
-  line-height: 1;          /* CRITICAL — stops line-height from inflating height */
+  line-height: 1;
   letter-spacing: 0.01em;
   white-space: nowrap;
-  color: #0a1628;          /* Dark text on bright gradient */
+  color: #03070f;
   text-decoration: none;
-
-  /* Visual */
-  background: linear-gradient(135deg, #22d3ee 0%, #38bdf8 55%, #818cf8 100%);
-  border: 2px solid transparent;   /* transparent border, not none — prevents paint artifacts */
-  /* Subtle shadow — dark only, NO cyan color that looked like a border ring */
-  box-shadow: 0 2px 12px rgba(0,0,0,0.35);
-
-  /* Behaviour */
+  background: linear-gradient(135deg, #22d3ee 0%, #38bdf8 50%, #818cf8 100%);
+  border: none;
+  box-shadow: 0 4px 20px rgba(34,211,238,0.25), 0 1px 0 rgba(255,255,255,0.1) inset;
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
-  transition: transform 0.16s ease, box-shadow 0.16s ease;
+  transition: transform 0.18s cubic-bezier(0.22,1,0.36,1), box-shadow 0.18s ease;
+  overflow: hidden;
+}
 
-  /* NO overflow:hidden — that's what caused text clipping */
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #67e8f9 0%, #22d3ee 40%, #6366f1 100%);
+  opacity: 0;
+  transition: opacity 0.28s ease;
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 8px 32px rgba(34,211,238,0.35), 0 1px 0 rgba(255,255,255,0.15) inset;
 }
+.btn-primary:hover::before { opacity: 1; }
 
 .btn-primary:active {
   transform: scale(0.975);
-  box-shadow: 0 1px 6px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 10px rgba(34,211,238,0.2);
 }
 
-/* Remove ALL browser focus rings */
-.btn-primary:focus,
 .btn-primary:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(34,211,238,0.35), 0 2px 12px rgba(0,0,0,0.35);
+  box-shadow: 0 0 0 3px rgba(34,211,238,0.4), 0 4px 20px rgba(34,211,238,0.25);
 }
 
-/* Hover shimmer overlay — pointer-events:none so it NEVER blocks clicks */
+/* Text / icon sits above the ::before overlay */
 .btn-primary .btn-hover-overlay {
   position: absolute;
   inset: 0;
@@ -220,11 +340,10 @@
   background: linear-gradient(135deg, #67e8f9 0%, #22d3ee 40%, #6366f1 100%);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.28s ease;
 }
 .btn-primary:hover .btn-hover-overlay { opacity: 1; }
 
-/* Text / icon wrapper — sits above the overlay */
 .btn-primary .btn-label {
   position: relative;
   z-index: 1;
@@ -236,69 +355,62 @@
   color: inherit;
 }
 
-/* Size modifiers */
+/* Size variants */
 .btn-primary.btn-lg {
-  padding: 15px 32px;
+  padding: 15px 34px;
   font-size: 16px;
-  border-radius: 14px;
+  border-radius: 16px;
 }
 .btn-primary.btn-sm {
   padding: 9px 18px;
   font-size: 13px;
-  border-radius: 9px;
+  border-radius: 10px;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   BTN-GHOST  (secondary / outline button)
-───────────────────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   BTN-GHOST — Secondary / outline button
+═══════════════════════════════════════════════════════════════════════════ */
 .btn-ghost {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 13px 24px;
-  border-radius: 12px;
-  font-family: inherit;
+  padding: 13px 26px;
+  border-radius: 14px;
+  font-family: 'Inter', sans-serif;
   font-size: 15px;
   font-weight: 600;
   line-height: 1;
   white-space: nowrap;
-  color: rgba(203,213,225,0.88);
+  color: rgba(203,213,225,0.9);
   text-decoration: none;
-  border: 1.5px solid rgba(255,255,255,0.14);
-  background: rgba(255,255,255,0.04);
+  border: 1.5px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.03);
   cursor: pointer;
   user-select: none;
-  -webkit-user-select: none;
-  transition: all 0.18s ease;
+  transition: all 0.2s cubic-bezier(0.22,1,0.36,1);
 }
 
 .btn-ghost:hover {
-  border-color: rgba(255,255,255,0.3);
+  border-color: rgba(255,255,255,0.28);
   color: #fff;
-  background: rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.07);
   transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
-
 .btn-ghost:active { transform: scale(0.975); }
-
-.btn-ghost:focus,
-.btn-ghost:focus-visible {
-  outline: none;
-  border-color: rgba(34,211,238,0.5);
-}
+.btn-ghost:focus-visible { border-color: rgba(34,211,238,0.5); }
 
 .btn-ghost.btn-lg {
-  padding: 15px 28px;
+  padding: 15px 30px;
   font-size: 16px;
-  border-radius: 14px;
+  border-radius: 16px;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   BTN-SUBMIT  (full-width form submit — Login / Register pages)
-   Same fix logic as btn-primary.
-───────────────────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   BTN-SUBMIT — Full-width form CTA
+═══════════════════════════════════════════════════════════════════════════ */
 .btn-submit {
   position: relative;
   display: flex;
@@ -306,45 +418,40 @@
   justify-content: center;
   gap: 8px;
   width: 100%;
-  padding: 15px 24px;          /* explicit padding, no fixed height */
-  border-radius: 12px;
-  font-family: inherit;
+  padding: 16px 24px;
+  border-radius: 14px;
+  font-family: 'Inter', sans-serif;
   font-size: 15px;
   font-weight: 700;
-  line-height: 1;              /* CRITICAL */
-  color: #0a1628;
-  background: linear-gradient(135deg, #22d3ee 0%, #38bdf8 55%, #818cf8 100%);
-  border: 2px solid transparent;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  line-height: 1;
+  color: #03070f;
+  background: linear-gradient(135deg, #22d3ee 0%, #38bdf8 50%, #818cf8 100%);
+  border: none;
+  box-shadow: 0 4px 20px rgba(34,211,238,0.25), 0 1px 0 rgba(255,255,255,0.1) inset;
   cursor: pointer;
   user-select: none;
-  -webkit-user-select: none;
-  transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
+  overflow: hidden;
+  transition: transform 0.18s cubic-bezier(0.22,1,0.36,1), box-shadow 0.18s ease, opacity 0.16s ease;
 }
 
 .btn-submit:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  box-shadow: 0 8px 28px rgba(34,211,238,0.35), 0 1px 0 rgba(255,255,255,0.15) inset;
 }
-
 .btn-submit:active:not(:disabled) {
   transform: scale(0.977);
-  box-shadow: 0 1px 6px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 10px rgba(34,211,238,0.2);
 }
-
 .btn-submit:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
   transform: none !important;
 }
-
-.btn-submit:focus,
 .btn-submit:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(34,211,238,0.35), 0 2px 12px rgba(0,0,0,0.3);
+  box-shadow: 0 0 0 3px rgba(34,211,238,0.4), 0 4px 20px rgba(34,211,238,0.25);
 }
 
-/* Hover shimmer overlay */
+/* Shimmer overlay on hover */
 .btn-submit .btn-hover-overlay {
   position: absolute;
   inset: 0;
@@ -352,11 +459,10 @@
   background: linear-gradient(135deg, #67e8f9 0%, #22d3ee 40%, #6366f1 100%);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.28s ease;
 }
 .btn-submit:not(:disabled):hover .btn-hover-overlay { opacity: 1; }
 
-/* Text wrapper */
 .btn-submit .btn-label {
   position: relative;
   z-index: 1;
@@ -367,50 +473,189 @@
   color: inherit;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   INPUT-PREMIUM  (all text inputs on Login / Register / TripForm)
-───────────────────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   INPUT-PREMIUM — All form inputs
+═══════════════════════════════════════════════════════════════════════════ */
 .input-premium {
   display: block;
   width: 100%;
-  padding: 0 18px;
-  height: 52px;                   /* explicit px height */
-  border-radius: 10px;
-  border: 1.5px solid rgba(51,65,85,0.7);
-  background: rgba(10,15,35,0.85);
+  padding: 0 20px;
+  height: 54px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(51,65,85,0.6);
+  background: rgba(8, 14, 28, 0.8);
   color: #f1f5f9;
   font-size: 15px;
-  font-family: inherit;
-  line-height: 52px;              /* vertically center text */
+  font-family: 'Inter', sans-serif;
+  line-height: 54px;
   outline: none;
   -webkit-appearance: none;
   appearance: none;
-  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
-.input-premium::placeholder { color: rgba(71,85,105,0.8); }
+.input-premium::placeholder {
+  color: rgba(71,85,105,0.7);
+  font-weight: 400;
+}
 
 .input-premium:hover:not(:focus) {
   border-color: rgba(71,85,105,0.9);
+  background: rgba(10, 16, 32, 0.9);
 }
 
 .input-premium:focus {
   border-color: rgba(34,211,238,0.55);
-  box-shadow: 0 0 0 3px rgba(34,211,238,0.12);
-  background: rgba(10,15,35,0.95);
+  box-shadow: 0 0 0 4px rgba(34,211,238,0.1), 0 1px 0 rgba(34,211,238,0.08) inset;
+  background: rgba(10,16,32,0.95);
 }
 
-/* Autofill — already handled in @layer base above, but repeat for specificity */
 .input-premium:-webkit-autofill,
 .input-premium:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 9999px #0f172a inset, 0 0 0 3px rgba(34,211,238,0.12) !important;
+  -webkit-box-shadow: 0 0 0 9999px #0c1424 inset, 0 0 0 4px rgba(34,211,238,0.1) !important;
   -webkit-text-fill-color: #f1f5f9 !important;
 }
 
-/* glass-surface alias (used in TripForm & Protected loading screen) */
-.glass-surface {
-  background: rgba(255,255,255,0.025);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255,255,255,0.07);
+/* ═══════════════════════════════════════════════════════════════════════════
+   BADGE-LIVE — Pulsing status badge
+═══════════════════════════════════════════════════════════════════════════ */
+.badge-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(34,211,238,0.25);
+  background: rgba(6,182,212,0.08);
+  font-size: 11px;
+  font-weight: 700;
+  color: #67e8f9;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  line-height: 1;
+  user-select: none;
+}
+
+.badge-live .dot {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+}
+
+.badge-live .dot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #22d3ee;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.badge-live .dot::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: rgba(34,211,238,0.25);
+  animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes ping-slow {
+  75%, 100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GRADIENT SEPARATORS
+═══════════════════════════════════════════════════════════════════════════ */
+.separator-cyan {
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(34,211,238,0.4), transparent);
+}
+.separator-indigo {
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(129,140,248,0.3), transparent);
+}
+.separator-subtle {
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.06), transparent);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NOISE TEXTURE OVERLAY
+═══════════════════════════════════════════════════════════════════════════ */
+.noise-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PRINT STYLES
+═══════════════════════════════════════════════════════════════════════════ */
+@media print {
+  @page { margin: 1.5cm; size: A4; }
+
+  body {
+    background: white !important;
+    color: #111 !important;
+    font-size: 12pt !important;
+  }
+
+  .print\:hidden { display: none !important; }
+
+  .glass-surface, .glass-card {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+  }
+
+  /* ── CRITICAL FIX: Make gradient/shimmer text visible in print ─────────
+     .text-shimmer sets:
+       -webkit-text-fill-color: transparent  (overrides all color settings!)
+       background-clip: text
+     In print, the gradient background doesn't render, so the text becomes
+     completely invisible. We must forcefully reset these properties.
+  ── */
+  .text-shimmer,
+  .text-shimmer-gold {
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+    -webkit-text-fill-color: #111 !important;
+    color: #111 !important;
+    animation: none !important;
+  }
+
+  /* ── Kill all animations and transitions ── */
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* ── Hide decorative-only elements ── */
+  .badge-live,
+  .noise-overlay {
+    display: none !important;
+  }
+
+  /* ── Flatten the timeline indent so cards don't overflow on A4 ──
+     The paddingLeft: 92px on .print-activity-list creates a wide indent
+     that looks bad in the PDF. Remove it in print. ── */
+  .print-activity-list {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+  }
+
+  /* ── Force text colors to be readable on white paper ── */
+  h1, h2, h3, h4, h5, h6 {
+    color: #0f172a !important;
+  }
+  p, span, li, div {
+    color: inherit;
+  }
 }
