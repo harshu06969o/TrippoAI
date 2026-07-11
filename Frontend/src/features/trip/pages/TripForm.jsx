@@ -222,7 +222,7 @@ const TripForm = () => {
   const [error, setError]     = useState("");
   const [formData, setFormData] = useState({
     destination: "",
-    days:        "",
+    days:        1,
     budget:      "Moderate",
     travelers:   1,
   });
