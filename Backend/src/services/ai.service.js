@@ -1,9 +1,34 @@
 const { GoogleGenAI } = require("@google/genai")
 const puppeteer = require("puppeteer")
 
+const apiKey = process.env.GOOGLE_GENAI_API_KEY || process.env.GEMINI_API_KEY
+
 const ai = new GoogleGenAI({
-    apiKey: process.env.GOOGLE_GENAI_API_KEY
+    apiKey: apiKey
 })
+
+// Priority order: gemini-3.5-flash-lite -> gemini-3.1-flash-lite -> gemini-2.5-flash
+const CANDIDATE_MODELS = [
+    process.env.GEMINI_MODEL,
+    "gemini-3.5-flash-lite",
+    "gemini-3.1-flash-lite",
+    "gemini-2.5-flash"
+].filter(Boolean)
+
+const UNIQUE_MODELS = [...new Set(CANDIDATE_MODELS)]
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+function cleanAndParseJSON(rawText) {
+    if (!rawText) throw new Error("Empty response from AI model")
+    let cleaned = rawText.trim()
+    if (cleaned.startsWith("```json")) {
+        cleaned = cleaned.replace(/^```json\s*/i, "").replace(/```$/, "").trim()
+    } else if (cleaned.startsWith("```")) {
+        cleaned = cleaned.replace(/^```\s*/, "").replace(/```$/, "").trim()
+    }
+    return JSON.parse(cleaned)
+}
 
 async function generateTripItinerary({ destination, days, budget, travelers }) {
     const prompt = `You are an elite, hyper-detail-oriented travel concierge and local expert for ${destination}. 
@@ -22,15 +47,57 @@ async function generateTripItinerary({ destination, days, budget, travelers }) {
     - estimatedTotalCost: String showing the total estimated cost.
     Do not wrap the JSON in markdown backticks like \`\`\`json, just output the raw JSON directly.`;
 
- const response = await ai.models.generateContent({
-        model: "gemini-3.1-flash-lite",
-        contents: prompt,
-        config: {
-            responseMimeType: "application/json"
-        }
-    })
+    let lastError = null
 
-    return JSON.parse(response.text)
+    // Try each model in sequence: gemini-3.5-flash-lite -> gemini-3.1-flash-lite -> gemini-2.5-flash
+    for (const model of UNIQUE_MODELS) {
+        for (let attempt = 1; attempt <= 2; attempt++) {
+            try {
+                console.log(`[AI Service] Attempting trip generation with model '${model}' (attempt ${attempt})...`)
+                const response = await ai.models.generateContent({
+                    model: model,
+                    contents: prompt,
+                    config: {
+                        responseMimeType: "application/json"
+                    }
+                })
+
+                if (response && response.text) {
+                    console.log(`[AI Service] Trip itinerary generated successfully using '${model}'!`)
+                    return cleanAndParseJSON(response.text)
+                }
+            } catch (error) {
+                lastError = error
+                const isUnavailableOrBusy = error.status === 503 || 
+                                           error.status === 429 || 
+                                           error.status === 404 ||
+                                           error.message?.includes("503") || 
+                                           error.message?.includes("high demand") ||
+                                           error.message?.includes("UNAVAILABLE") ||
+                                           error.message?.includes("not found")
+
+                console.warn(`[AI Service] Model '${model}' attempt ${attempt} failed: ${error.message}`)
+
+                // If busy and still has another attempt on this model, wait briefly and retry
+                if (isUnavailableOrBusy && attempt < 2 && error.status !== 404) {
+                    const delayMs = attempt * 1000
+                    console.log(`[AI Service] Retrying '${model}' in ${delayMs}ms...`)
+                    await sleep(delayMs)
+                    continue
+                }
+
+                // Move on to next fallback model
+                console.log(`[AI Service] Model '${model}' unavailable or congested. Moving to next fallback model...`)
+                break
+            }
+        }
+    }
+
+    // All models exhausted or unavailable
+    const serverLoadError = new Error("The server is currently experiencing high load and receiving too many requests. Please try again after a while.")
+    serverLoadError.status = 503
+    serverLoadError.originalError = lastError?.message
+    throw serverLoadError
 }
 
 async function generatePdfFromHtml(htmlContent) {

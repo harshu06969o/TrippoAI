@@ -42,7 +42,20 @@ async function generateTripController(req, res) {
 
     } catch (error) {
         console.error("Trip Generation Error:", error)
-        res.status(500).json({ message: "Failed to generate trip", error: error.message })
+        const isHighLoadOrUnavailable = error.status === 503 ||
+                                        error.status === 429 ||
+                                        error.message?.includes("high load") ||
+                                        error.message?.includes("too many requests") ||
+                                        error.message?.includes("503") ||
+                                        error.message?.includes("high demand") ||
+                                        error.message?.includes("UNAVAILABLE")
+
+        const status = isHighLoadOrUnavailable ? 503 : 500
+        const message = isHighLoadOrUnavailable
+            ? "The server is currently experiencing high load and receiving too many requests. Please try again after a while."
+            : (error.message || "Failed to generate trip")
+
+        res.status(status).json({ message, error: error.message })
     }
 }
 
